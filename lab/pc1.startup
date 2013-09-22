@@ -1,0 +1,7 @@
+/etc/init.d/networking start
+
+echo '193.1.193.65	ftp.ie.debian.org' | cat >> /etc/hosts
+
+apt-get --yes --force-yes install sendemail 
+
+chmod 600 /root/.ssh/id_rsa

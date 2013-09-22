@@ -1,0 +1,52 @@
+IfModule mod_ssl.c>
+<VirtualHost _default_:443>
+DocumentRoot "/var/www/testssl"
+
+ServerName www.secure,privato.esame.com:443
+ServerAdmin secure@esame.com
+
+SSLEngine On
+SSLCipherSuite HIGH:MEDIUM
+SSLProtocol all -SSLv2
+
+SSLCertificateFile /etc/apache2/ssl/server.crt
+SSLCertificateKeyFile /etc/apache2/ssl/server.key
+
+SSLCertificateChainFile /etc/apache2/ssl/ca.crt
+SSLCACertificateFile /etc/apache2/ssl/ca.crt
+
+<Directory "/var/www/testssl/privato">
+        Options Indexes
+        AllowOverride None
+        Allow from from all
+        Order allow,deny
+	AuthType Basic
+	AuthName "Richiesta autenticazione Username e Password"
+	AuthUserFile /root/password
+	Require valid-user
+
+</Directory>
+
+ErrorLog /var/log/apache2/cgrlweb.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+
+	CustomLog /var/log/apache2/access.log combined
+
+#<Directory "/var/www/testssl/secret">
+#	AuthType Basic
+#	AuthName "Richiesta autenticazione Username e Password"
+#	AuthUserFile /etc/apache2/.htpasswd
+#	Require valid-user
+#</Directory>
+
+#<Directory /var/www/testssl/cert-requested>
+#	SSLVerifyClient require
+#	SSLVerifyDepth 1
+#</Directory>
+
+</VirtualHost>
+</IfModule>
+

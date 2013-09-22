@@ -1,0 +1,8 @@
+/etc/init.d/networking start
+chown quagga:quagga /etc/quagga/*.conf
+/etc/init.d/quagga start
+
+#Utente per SSH
+useradd sysadmin -g users -m -p $(mkpasswd sys)
+mkdir -p /home/sysadmin/.ssh
+cp hostlab/authorized_keys /home/sysadmin/.ssh/authorized_keys

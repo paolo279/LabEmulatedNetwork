@@ -1,0 +1,45 @@
+------------------------------------
+Generare chiavi SSH:
+
+Da pc1:
+
+ssh-keygen -t rsa
+
+ssh sysadmin@1.0.0.1 mkdir -p .ssh
+cat .ssh/id_rsa.pub | ssh sysadmin@1.0.0.1 'cat >> .ssh/authorized_keys'
+
+Da qui in poi lanciando il comando:
+
+ssh sysadmin@1.0.0.1 
+
+la connessione avverra senza la richiesta dalla password
+UPDATE: sistemato da script fa tutto in automatico 
+-------------------------------------------------------------------------------
+
+Mandare una mail da pc1:
+
+scaricare sendmail e lanciare il comando:
+
+sendemail -f pluto@privato.esame.com -t pippo@privato.esame.com -u "Quali novità?" -s mail.privato.esame.com
+
+controllare poi la posta da serverpriv
+---------------------------------------------------------------------
+
+VPN tra pc4 e r1:
+
+lanciare i comandi screen sulle due macchine, secguiti da CTRL+A C per caricare una nuova schermata.
+Usere i comandi CTRL+A N per switchare le schermate
+
+Fare partire i seguenti comandi:
+
+r1: openvpn server.conf
+pc4: openvpn client.conf
+
+Adesso tra pc4 e r1 ci sarà una rete virtuale che li unisce e possiamo collegarci ai pc privati.
+------------------------------------------------------------------------------------------------------
+
+Server Web HTTPS:
+
+collegarsi a https://www.secure.privato.esame.com con username e password: cgrl, 1234
+
+anche l'area riservata di wwww.privato.esame.com utilizza le stesse password 

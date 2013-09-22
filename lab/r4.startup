@@ -1,0 +1,12 @@
+echo 1 > /proc/sys/net/ipv4/ip_forward
+/etc/init.d/networking start
+chown quagga:quagga /etc/quagga/*.conf
+/etc/init.d/quagga start
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE
+iptables -t nat -A POSTROUTING -o eth2 -j MASQUERADE
+
+#Login SSH
+useradd sysadmin -g users -m -p $(mkpasswd sys)
+mkdir -p /home/sysadmin/.ssh
+cp hostlab/authorized_keys /home/sysadmin/.ssh/authorized_keys

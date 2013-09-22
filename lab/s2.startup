@@ -1,0 +1,2 @@
+/etc/init.d/networking start
+ip route add default via 1.0.2.1

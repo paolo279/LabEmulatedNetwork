@@ -1,0 +1,17 @@
+;
+; BIND reverse data file for broadcast zone
+;
+$TTL	604800
+; $ORIGIN 1.0.10.IN-ADDR.ARPA.
+@	IN	SOA	ns.privato.esame.com. hostmaster.privato.esame.com. (
+			      1		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+	IN	NS	ns.privato.esame.com.
+
+1	IN	PTR	ns.privato.esame.com.
+
+

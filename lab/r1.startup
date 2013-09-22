@@ -1,0 +1,94 @@
+#SERVIZI
+echo 1 > /proc/sys/net/ipv4/ip_forward
+/etc/init.d/networking start
+/etc/init.d/dhcp3-server start
+chown quagga:quagga /etc/quagga/*.conf 
+/etc/init.d/quagga start
+/etc/init.d/ssh start
+
+#Login SSH
+useradd sysadmin -g users -m -p $(mkpasswd sys)
+mkdir -p /home/sysadmin/.ssh
+cp hostlab/authorized_keys /home/sysadmin/.ssh/authorized_keys
+
+#NAT
+iptables -A POSTROUTING -s 10.0.0.0/24 -t nat -j MASQUERADE
+iptables -A POSTROUTING -s 10.0.1.0/24 -t nat -j MASQUERADE
+iptables -A POSTROUTING -s 10.0.2.0/24 -t nat -j MASQUERADE
+iptables -A POSTROUTING -s 1.0.0.0/24 -t nat -j MASQUERADE
+
+
+
+
+
+#DNAT
+iptables -t nat -A PREROUTING -d 192.168.0.2 -p tcp --dport 443 -j DNAT --to-destination 10.0.1.2:443
+iptables -t nat -A PREROUTING -d 192.168.0.2 -p tcp --dport 80 -j DNAT --to-destination 10.0.1.2:80
+iptables -t nat -A PREROUTING -d 1.1.255.13 -p tcp --dport 80 -j DNAT --to-destination 10.0.1.2:80
+iptables -t nat -A PREROUTING -d 1.1.255.13 -p tcp --dport 80 -j DNAT --to-destination 10.0.1.2:80
+iptables -t nat -A PREROUTING -d 1.1.255.13 -p tcp --dport 443 -j DNAT --to-destination 10.0.1.2:443
+iptables -t nat -A PREROUTING -d 1.1.255.13 -p tcp --dport 53 -j DNAT --to-destination 10.0.1.2:53
+#firewall
+iptables -P FORWARD DROP
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -A FORWARD -i eth0 -o eth4 -j ACCEPT
+iptables -A FORWARD -i eth0 -o eth5 -j ACCEPT
+iptables -A FORWARD -i eth4 -o eth0 -j ACCEPT
+iptables -A FORWARD -i eth5 -o eth0 -j ACCEPT
+iptables -A OUTPUT -p ospf -o eth5 -j ACCEPT
+iptables -A INPUT -p ospf -i eth5 -j ACCEPT
+#3punto
+iptables -A FORWARD -i eth1 -o eth0 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth0 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth3 -o eth0 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth0 -m state --state ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth2 -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth3 -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth1 -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth3 -j ACCEPT
+iptables -A FORWARD -i eth3 -o eth1 -j ACCEPT
+iptables -A FORWARD -i eth3 -o eth2 -j ACCEPT
+#4punto
+iptables -A FORWARD -i eth1 -o eth2 -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth3 -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth1 -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth3 -j ACCEPT
+iptables -A FORWARD -i eth3 -o eth1 -j ACCEPT
+iptables -A FORWARD -i eth3 -o eth2 -j ACCEPT
+#5punto
+
+iptables -A FORWARD -i eth4 -p tcp --dport 443 -j ACCEPT
+iptables -A FORWARD -i eth4 -p tcp --dport 80 -j ACCEPT
+iptables -A FORWARD -i eth4 -p icmp -j ACCEPT
+
+iptables -A FORWARD -i eth1 -p tcp -m multiport --dports 80,21,22,53,443 -j ACCEPT
+iptables -A FORWARD -i eth2 -p tcp -m multiport --dports 80,21,22,53,443 -j ACCEPT
+iptables -A FORWARD -i eth3 -p tcp -m multiport --dports 80,21,22,53,443 -j ACCEPT
+iptables -A FORWARD -i eth1 -p icmp -j ACCEPT
+iptables -A FORWARD -i eth2 -p icmp -j ACCEPT
+iptables -A FORWARD -i eth3 -p icmp -j ACCEPT
+iptables -A FORWARD -i eth4 -o eth1 -m state --state ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth4 -o eth2 -m state --state ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth4 -o eth3 -m state --state ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth5 -o eth1 -m state --state ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth5 -o eth2 -m state --state ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i eth5 -o eth3 -m state --state ESTABLISHED -j ACCEPT
+#6punto
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+#7punto
+iptables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT
+
+iptables -A FORWARD -i eth4 -p icmp -j ACCEPT
+
+#VPN
+iptables -A INPUT -p udp --dport 1194 -j ACCEPT
+iptables -A FORWARD -i tun0 -j ACCEPT
+iptables -A FORWARD -o tun0 -j ACCEPT
+
+#Server SSL
+iptables -A FORWARD -i eth2 -o eth4 -p tcp --sport 443 -j ACCEPT
+

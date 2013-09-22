@@ -1,0 +1,16 @@
+/etc/init.d/networking start
+/etc/init.d/apache2 start
+/etc/init.d/bind start
+/etc/init.d/postfix start
+a2enmod ssl
+#nome del virtual host da abilitare mettere il nome file che sta in sites avaible
+a2ensite secure.privato.esame.edu
+a2ensite privato
+
+/etc/init.d/apache2 reload
+
+#ADDUSER
+useradd pippo -g users -d /home/pippo -m -p $(mkpasswd 1234)
+useradd pluto -g users -d /home/pluto -m -p $(mkpasswd 1234)
+useradd sysadmin -g users -m -p $(mkpasswd sys)
+newaliases
